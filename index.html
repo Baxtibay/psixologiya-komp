@@ -145,6 +145,11 @@
     #search-input {
       opacity: 0.4;
     }
+
+    .mic-button {
+      background: transparent;
+      border: none;
+    }
   </style>
 </head>
 
@@ -163,7 +168,9 @@
   <div class="search-box">
     <img src="./svg/search_icon.svg" alt="Search Icon" width="20" height="20">
     <input id="search-input" type="text" placeholder="Search Google or type a URL" autocomplete="off">
-    <img src="./img/mic.webp" alt="Mic Icon" width="30" height="30">
+    <button class="mic-button" type="button">
+      <img src="./img/mic.webp" alt="Mic Icon" width="30" height="30">
+    </button>
   </div>
 
   <div class="results" id="results">
@@ -174,6 +181,9 @@
     const searchInput = document.getElementById('search-input')
     const resultsDiv = document.getElementById('results')
     const resultsList = document.getElementById('results-list')
+    const elButton = document.querySelector('.mic-button')
+
+
 
     const questionsAndAnswers = [
       {
@@ -601,7 +611,18 @@
     searchInput.addEventListener('blur', function () {
       searchInput.value = '' // Fokus yo'qolsa — matnni o'chirish
       resultsDiv.style.display = 'none'
-    });
+    })
+
+    elButton.addEventListener('click', function () {
+      console.log('click')
+      resultsDiv.style.display = 'block'
+      resultsList.innerHTML = questionsAndAnswers.map(qa => `
+        <li>
+          <strong>${qa.question}</strong><br>
+          ${qa.answer}
+        </li>
+      `).join('')
+    })
   </script>
 </body>
 

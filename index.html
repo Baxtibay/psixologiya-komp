@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Новая вкладка</title>
+  <!-- icon for URL -->
+  <link rel="shortcut icon" type="x-icon" href="img/chrome.png">
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      background-color: #ffffff;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::-webkit-scrollbar {
+      display: none;
+    }
+
+    .google-header {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      box-sizing: border-box;
+    }
+
+    .menu-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .google-img {
+      width: 272px;
+      height: 90px;
+      margin-top: 150px;
+      margin-bottom: 50px;
+    }
+
+    .apps {
+      display: flex;
+      gap: 10px;
+    }
+
+    .apps img {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #666;
+    }
+
+    .profile img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .logo {
+      width: 272px;
+      margin: 50px 0 20px;
+    }
+
+    .search-box {
+      width: 600px;
+      max-width: 90%;
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 24px;
+      padding: 10px 15px;
+      box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      padding: 8px;
+    }
+
+    .search-box .icon {
+      margin-right: 10px;
+      font-size: 20px;
+      color: gray;
+    }
+
+    .search-box .mic {
+      font-size: 20px;
+      color: gray;
+      cursor: pointer;
+    }
+
+    .results {
+      width: 600px;
+      height: 40%;
+      max-width: 90%;
+      margin-top: 10px;
+      border-radius: 8px;
+      /* box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);   */
+      padding: 10px;
+      opacity: 0.5;
+      display: none;
+      overflow-x: hidden;
+    }
+
+    .results::-webkit-scrollbar {
+      display: none;
+    }
+
+    .results ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .results li {
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .results li:last-child {
+      border-bottom: none;
+    }
+
+    .results li span {
+      font-weight: bold;
+    }
+
+    #search-input {
+      opacity: 0.4;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="google-header">
+    <div class="app"></div>
+    <div class="profile">
+      <span>Gmail</span>
+      <span>Images</span>
+      <img class="menu-icon" src="./img/menu.png" alt="Profile">
+      <img src="https://www.gstatic.com/images/branding/product/1x/avatar_circle_blue_120dp.png" alt="Profile">
+    </div>
+  </div>
+  <img class="google-img" src="./img/google-logo.png" class="logo" alt="Google" width="272" height="90">
+
+  <div class="search-box">
+    <img src="./svg/search_icon.svg" alt="Search Icon" width="20" height="20">
+    <input id="search-input" type="text" placeholder="Search Google or type a URL" autocomplete="off">
+    <img src="./img/mic.webp" alt="Mic Icon" width="30" height="30">
+  </div>
+
+  <div class="results" id="results">
+    <ul id="results-list"></ul>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('search-input')
+    const resultsDiv = document.getElementById('results')
+    const resultsList = document.getElementById('results-list')
+
+    const questionsAndAnswers = [
+      {
+        question: "”Pedagogika” túsinigi:",
+        answer: "Insan shaxsınıń qáliplesiwi hám rawajlanıwın uyreniwshi ilimiy tarawdıń"
+      },
+      {
+        question: "Tálim quralı ",
+        answer: "oqiw processinde qoyılǵan maqset hám wazıypalardı sheshiw imkaniyatın beretuǵın ideal hám materiallıq ob'ektler kompleksi"
+      },
+      {
+        question: "Pedagogikalıq sistemaǵa kiretuǵın pánler",
+        answer: "Ulıwma pedagogika, jasqa baylanıslı pedagogika, social pedagogika, bólek pánlerdi úyreniw metodikası"
+      },
+      {
+        question: "Qaysı túsinik (termin) tálim teoriyası túsinigi emes?",
+        answer: "motivatsiya"
+      },
+      {
+        question: "Psixologiya páni neni úyrenedi?",
+        answer: "psixik processler hám shaxstıń individual psixologiyalıq qásiyetleriniń ulıwma nizamlıqları, kórinetuǵın bolıw mexanizmleri hám faktlarini úyrenedi"
+      },
+      {
+        question: "Túrli jasdaǵı adamlardıń tuwılǵannan tap omiriniń aqırıǵa shekem psixik rawajlanıw procesi, shaxstıń qáliplesiw hám óz-ara qatnasları nizamlıqların psixologiyaning qaysı tarmaǵı úyrenedi?",
+        answer: "jas dáwirler psixologiyasi"
+      },
+      {
+        question: "Ań menen iskerlik bir-birine keri emes, bıraq olar bir-birine aynan uqsas da emes, biraq birlikti shólkemlestiriwdi ańlatadı. Bul psixologiya pánniń qaysı principin ańlatadı?",
+        answer: "psixikani izertlew insannıń sanalı iskerligin úyreniw bolıp tabıladı"
+      },
+      {
+        question: "…yuksak dárejede shólkemlesken materiya, yaǵnıy miydiń ózgesheligi bolıp, bul qasiyet ob'ektiv bolmıstı, sub'ektiv sáwlelendiriwden ibarat. Noqatlar ornına kerekli sózdi qoyıng?",
+        answer: " xulq-atvor"
+      },
+      {
+        question: "Social hám shaxslararo qatnaslardıń maxsuli, sanalı iskerliginiń subyekti bolǵan individ - bu…",
+        answer: "shaxs"
+      },
+      {
+        question: "Eksperiment metodınıń túrleri qaysı bandda tuwrı berilgen?",
+        answer: "Tábiyiy hám laboratoriya eksperiment"
+      },
+      {
+        question: "Sezimdiń sapası - bul:",
+        answer: "sezgining basqa sezim túrlerinen parıqlaydı "
+      },
+      {
+        question: "Subyekt sanasınań bir iskerlikten ekinshi bir iskerlikke, bir obiektten ekinshi obiektke, bir háreketden ekinshi bir háreketke ótiwi - bul",
+        answer: "Dıqqattıń kóshiwi"
+      },
+      {
+        question: "Insan sanasınań óz subyektiv tásirleniwlerine, sezim-sezimlerine, umtılıwlarına qaratılıwı ",
+        answer: "Qálegen dıqqat "
+      },
+      {
+        question: "Mútajlik qızıǵıwshılıq tiykarında qaysı dıqqat payda boladı?",
+        answer: "Sabırsız dıqqat "
+      },
+      {
+        question: "Bir retgine júdá qısqa waqıt aralıǵinda aqıl qılıw hám sol zag'otiyoq qaytaldan xotirlashdan keyin payda bolatuǵın yad bul",
+        answer: "operativ yad "
+      },
+      {
+        question: "Psixikaning eń joqarı basqıshı ne?",
+        answer: "Ań"
+      },
+      {
+        question: "Aqıl bul:",
+        answer: "analizatorlarga tásir etip turǵan zat hám hádiyselerdi, olardıń belgi hám qásiyetlerin miyada pútin bir pútkilliginshe sáwlelendiriw bolıp tabıladı"
+      },
+      {
+        question: "Shıdamlılıq - bul",
+        answer: "shaxsning sanalı háreketlerinde ózinen-ózi puqta biliwi hám de maqsetke erisiw "
+      },
+      {
+        question: "Aqıldıń pútinligi bul",
+        answer: "sezgi aǵzalarına tásir etetuǵın zattıń ózgesheligi hám belgileri haqqında ulıwmalastırılǵan bilimler payda bolıw ózgesheligi bolıp tabıladı"
+      },
+      {
+        question: "Ob'ektlerdiń forması, kólemi hám óz-ara birgelikte jaylasıwı, olar júzesi, olisligi hám baǵdarların aqıl etiw bul",
+        answer: "narsalar formasın aqıl qılıw"
+      },
+      {
+        question: "Kisiniń anglanilgan maqset menen basqarib turılatuǵın ishki hám sırtqı aktivligine ne dep ataladı?",
+        answer: "faoliyat"
+      },
+      {
+        question: "Insandı minez-qulıqǵa úndewshi ishki kúsh, bas sebep ne dep ataladı?",
+        answer: "motiv"
+      },
+      {
+        question: "Ózbekstan respublikasınıń “Talim tuwrısında”gi nızamı hám “Kadrlar tayarlaw milliy programması jámiyette eń úlken itıbardı nege qaratdı?",
+        answer: "Shaxsqa "
+      },
+      {
+        question: "Ínteraktiv-sóziniń manosi ne?",
+        answer: " Óz-ara háreket."
+      },
+      {
+        question: "Mektepge shekem talim qaysı talim mazmunı esaplanadı?",
+        answer: "Úzliksiz talim."
+      },
+      {
+        question: "Usıllar bul qanday process esaplanadı?",
+        answer: "Oqıtıwshı hám student arasındaǵı ayrıqsha process bolıp, onıń tiykarında ózlestiriwdiń formaları jatadı "
+      },
+      {
+        question: "…- biologiyalıq tárepten insannıń násillik hám tóplanǵan tájiriybesi tiykarında individual hám toparıy túrde mútajliklerin qandırıwǵa baǵdarlanǵan, undeytuǵın sezim",
+        answer: "Motivatsiya "
+      },
+      {
+        question: "Interaktiv tálimde tiykarǵı texnologiyalarǵa neler kiredi?",
+        answer: "interaktiv, metodlar, grafik organayzerlar, strategiyalar "
+      },
+      {
+        question: "Ínteraktiv sabaq ótiw metodları ",
+        answer: "dars processinde oqıwshı, studentler hám de oqıtıwshı arasında joqarı dárejede sheriklik ornatılatuǵın sabaq ótiw metodları"
+      },
+      {
+        question: "FSMU metodı neshe basqıshdan ibarat?",
+        answer: "4"
+      },
+      {
+        question: "Texnologiya - sóziniń manisi?",
+        answer: "biror ishda, uqıpda, kórkem ónerde qollanılatuǵın jollar, usıllar kompleksi"
+      },
+      {
+        question: "Qandayda bir maqset jolında intellektual, fizikalıq hám basqa háreketlerdi tez hám ónimli ámelge asırıwǵa umtılıw",
+        answer: "Aktivlik"
+      },
+      {
+        question: "Klaster (informaciyalardı jayıw ) metodı -",
+        answer: "keng qamtılǵan oylaw, úyrenilip atırǵan túsinik (kategoriya, hádiyse) lar, ideyalar arasında zárúrli bolǵan baylanısıwlardı anıqlaw, keń kólemli oylaw mamanlıǵın qáliplestiriwge qaratılǵan metod, pedagogikalıq strategiya"
+      },
+      {
+        question: "Jańalanıwdı, ózgeriwdi ámelge engiziw, kirgiziw procesi hám iskerligi.",
+        answer: "Innovatsiya"
+      },
+      {
+        question: "Ínteraktiv texnologiyalarǵa nelr kiredi",
+        answer: "Audiokanferensiyalar, videokanferensiyalar, kórgezbeli materiallar Basıp shiǵarılatuǵın materiallar"
+      },
+      {
+        question: "Pedagogika Psixologiya páni ústinde jumıs alıp barǵan pedagog hám ullı oqımıslılardı aytıń",
+        answer: "Forobiy, Al-Xorezmiy, Beruniy, Ibn Sino"
+      },
+      {
+        question: "Tálim bul-",
+        answer: "tajribeler almasınıw procesi bolıp, rejeli tiykarda ámelge asırilatuǵın “oqıtıwshı -oqıwshı” baylanısi. Tálim nátiyjesinde shaxs maǵlıwmatqa iye boladı, tárbiya tabadı hám rawaj -lanadi. Maǵlıwmat iyelew sistemasında tálim hám tárbiyanıń óz-ara baylanıslılıǵı hám baylanıslılıǵı júdá zárúrli juplıq esaplanadı"
+      },
+      {
+        question: "Pedagogikalıq texnologiya -",
+        answer: "Hámmesi tuwrı "
+      },
+      {
+        question: "Klaster texnologiyası bul-",
+        answer: "pedagogik strategiya bolıp, ol oqıwshılardıń qandayda bir temanı tereń úyreniwlerine járdem berip, temaǵa taallukli túsinik yamasa anıq pikirdi erkin hám ashıq túrde izbe-izlik menen ajıralmas baylanıstırǵan halda tarmaqlashlariga uyretedi informaciyanı qısqasha, qısqa bayanlaw, waqıya, hádiyse, processni bir neshe sózler menen ańlatıw bolıp tabıladı"
+      },
+      {
+        question: "…- bul studentlerdiń bilim, kónlikpe hám ilmiy tájriybeleri dárejesin hár tárepleme, qalıs bahalaw múmkinshiligin támiyinleytuǵın tapsırmalar kompleksi",
+        answer: "Assesment metodı "
+      },
+      {
+        question: "Psixologiyaning izertlew metodları ",
+        answer: "Shólkemlestirilgen, tájiriybe, maǵlıwmatlardı qayta islep shiqish, anıqlama beriw metodları"
+      },
+      {
+        question: "Baylanıs bul",
+        answer: "eki hám odan artıq kisiler arasındaǵı informaciya almastırıwlaw, óz-ara tásir hám bir-birin túsiniwden ibarat process retinde tán alıw etiledi"
+      },
+      {
+        question: "Shaxsningindividualpsixologikxususiyatlari",
+        answer: "temperament, xarakter, qábilet"
+      },
+      {
+        question: "Psixik faktlar qaysı qatarda tuwrı kórsetilgen?",
+        answer: "biliw processleri: sezim, aqıl yad, oylaw hám qıyal "
+      },
+      {
+        question: "Insan aktivliginiń tiykarlanıp eki túri parıq etedi",
+        answer: " ichki hám sırtqı "
+      },
+      {
+        question: "… iskerligi de shaxs kámalıde úlken rol oynaydı hám mánis kásip etedi. Bul sonday aktivlikki, onıń processinde bilimler, ilmiy tájriybe hám túrli kónlikpeler ózlestiriledi",
+        answer: "ta'lim "
+      },
+      {
+        question: "… shaxs individual rawajlanıwı processinde kórinetuǵın bolatuǵın baslanǵısh iskerlik túrlerinen biri. Bul iskerlik insandaǵı kúshli mútajliklerden biri - insan bolıw, adamlarǵa uqsap sóylew, olardı túsiniw, súyiw, óz-ara qatnaslardı muwapıqlastırıwǵa qaratılǵan mútajliklerinen kelip shıǵadı",
+        answer: "Baylanıs"
+      },
+      {
+        question: "… -bul baylanıstiń oqıw tárbiyalıq processlerdi sezimiy fonı hám qural, mazmunın quraydı",
+        answer: "Pedagogikalıq baylanıs"
+      },
+      {
+        question: "Pedagogikalıq iskerlikte baylanıs qanday funksiyanı basqaradi",
+        answer: "barlıq juwaplar tuwrı"
+      },
+      {
+        question: "belgiler sisteması bolıp, ol baylanıs processinde psixik iskerlik jemisi retinde júzege keledi?",
+        answer: "noverbal "
+      },
+      {
+        question: "«Pedagogika» termini grekshe ( pais, paidos -…agogos-... ) … degen manoni ańlatadı ",
+        answer: "«bala» hám «jeteklew»"
+      },
+      {
+        question: "Pedagogika pániniń tiykarǵı kategoriya - túsinikleri qatarına kiredi:",
+        answer: "ta'lim"
+      },
+      {
+        question: "Pedagogika pániniń ob'ekti ",
+        answer: "Oqıwshı "
+      },
+      {
+        question: "Pedagogika pániniń predmeti:",
+        answer: "oquvchilarga berilip atırǵan tálim - tárbiya teoriyası hám ámeliyatı "
+      },
+      {
+        question: "Shaxstıń rawajlanıwına tásir etiwshi faktorlar ",
+        answer: "Genetika, ortalıq, tárbiya "
+      },
+      {
+        question: "Shaxs rawajlanıwı júz bolatuǵın haqıyqat ",
+        answer: "Ortalıq "
+      },
+      {
+        question: "Pedagogikalıq texnikanıń strukturalıq bólimleri",
+        answer: "Oqıtıwshınıń óz sóylewin basqara alıw qábileti menen baylanıslı kónlikpeler, sawatlı hám ańlatpalı sóylewi, bilimi hám pikirin túsinikli etkaza alıwı"
+      },
+      {
+        question: "Pedagogika sózi qanday mánisti ańlatadı?",
+        answer: "bala jetekleymen"
+      },
+      {
+        question: "Pedagogika termininiń kelip shıǵıwı qaysı mámleket menen baylanıslı?",
+        answer: "Áyyemgi Gretsiya"
+      },
+      {
+        question: "FSMU metodınıń qollanılıwı izbe-izligin tuwrı jazıń. 1. Pikir bayanı 2. Pikir bayanına sebep kórsetiw 3. Kórsetken sebebińizdi tastıyıqlap beriń 4. Pikirińizdi ulıwmalastırıń ",
+        answer: "1234"
+      },
+      {
+        question: "…-bul metod orınlanǵan wazıypalarǵa tıykarlanıp studentler bilimin bahalaydı",
+        answer: "Assisment"
+      },
+      {
+        question: "Grafik organayzerlarga neler kiredi?",
+        answer: "Insert, keste, krassword, rebus, veen diogramma, ne ushın"
+      },
+      {
+        question: "Aqıl bul...",
+        answer: "sezgi aǵzalarına tikkeley tásir etip turǵan zat hám hádiyselerdiń obrazlarınıń kisi sanasında bir pútkil halda sáwlelendiriliwi bolıp tabıladı"
+      },
+      {
+        question: "Qaysı qatarda yad túsinigine tuwrı tariyp berilgen?",
+        answer: "  ilgeri aqıl etken basdan keshirgen hám atqarǵan islerimizdi yodda saqlaw keyinirek olardı eske túsiriwden ibarat process"
+      },
+      {
+        question: "Tómendegi juwaplardan qay-qaysısında qıyal tariypi tuwrı berilgen",
+        answer: "xayol aldın aqıl etilgen obrazlar tiykarında ele aqıl etilmegen zatlardıń obrazların sáwlelendiriw bolıp tabıladı"
+      },
+      {
+        question: "Birinshi pedagogikalıq pikirler tómendegi ilimpazlardıń dóretpelerde keltirilgen",
+        answer: "Sokrat, Platon, Aristotel"
+      },
+      {
+        question: "Topardaǵı shaxslararo qatnaslardı úyreniw múmkin",
+        answer: "Sotsiometriya"
+      },
+      {
+        question: "Psixologiyaning tiykarǵı waziypası ",
+        answer: "aqliy iskerlik nizamlıqların úyreniw"
+      },
+      {
+        question: " 'Test' túsinigin xarakteristikalaytuǵın belgi",
+        answer: "Haqıyqıylıq "
+      },
+      {
+        question: "Insanǵa tán bolǵan sáwlelendiriwdiń eń joqarı forması túsinik menen belgilenedi",
+        answer: "ong"
+      },
+      {
+        question: "Sananıń strukturalıq bólimlerinen biri",
+        answer: "o'z-ózin ańǵarıw "
+      },
+      {
+        question: "Temperament, bolmıs... kópshilik jeke ayrıqshalıqlardıń tiykarı bolıp tabıladı",
+        answer: "tuwma"
+      },
+      {
+        question: "Shaxstıń xarakteri tómendegilerde kórinetuǵın boladı ",
+        answer: "uning ózine, adamlarǵa, iskerlikke, zatlarǵa qatnası "
+      },
+      {
+        question: "Awızsha bolmaǵan baylanıs - bul tómendegiler arqalı ushırasıw procesi bolıp tabıladı",
+        answer: "Mimika hám ım-ishara -belgiler"
+      },
+      {
+        question: "Baylanıs, ádetde,.. .. tárepleriniń birliginde kórinetuǵın boladı ",
+        answer: "informaciyalı, pertseptiv, jónelisli"
+      },
+      {
+        question: "SHaxslararo qatnaslar - bul:",
+        answer: "odamlar arasında iskerlik hám toparlardaǵı baylanısde ornatılatuǵın qatnaslar "
+      },
+      {
+        question: "Aldın sanalı atqarıp, keyinirek avtomatlasqan hatti-háreketlerge …… aytıladı",
+        answer: "Ilmiy tájriybe"
+      },
+      {
+        question: "… - temperament túrlerinen, psixik aktivliktiń tómen, tez tez tásirleniwshilik, hátte arzımaǵan zatlar ushın xam júdá tereń tásirotga beriliwi menen xarakterlenedi",
+        answer: "Melanxolik"
+      },
+      {
+        question: "…- temperament túrlerinen. Bul tur shaqqan, jıldam, tásirleniwleri tez-tez ózgerip turatuǵın, basqa adamlarǵa salıstırǵanda dilkashlik hám mexribonlik qılıw páziyletleri menen xarakterlenedi",
+        answer: "Sangvinik"
+      },
+      {
+        question: "…- temperament túri, ol sezimdiń hushlılıǵı, keyiptiń bır jola tez ózgerip qalıwı, sezimdiń teń salmaqlılıqsızligi hám ulıwma jıldamlıǵı menen ańlatıladı",
+        answer: "Xolerik"
+      },
+      {
+        question: "…- temperament túrlerinen biri. Bul háreketlerdiń asteligi, turaqlılıǵın, emosional jaǵdaylardıń sırtqı kórinisleri kúshli emesliginde kórinetuǵın boladı",
+        answer: "Flegmatik "
+      },
+      {
+        question: "Oqıtıw metodın tabıń?",
+        answer: "nazorat, soraw -juwap, eksperement"
+      },
+      {
+        question: "Temperamentning neshe túri bar?",
+        answer: "4"
+      },
+      {
+        question: "Psixologiyani biliw pedagoglarǵa ne ushın kerek?",
+        answer: "o'z-ózin tárbiyalawǵa, balalardı durıs tárbiyalaw ushın o'larni hár tárepleme úyrenip biliw ushın "
+      },
+      {
+        question: "Xolerik temperament qaysı?",
+        answer: "kuchli, shıdamsız, jıldam "
+      },
+      {
+        question: "Sangvinik temperamenti qaysı?",
+        answer: "kúshli turaqlı, jıldam "
+      },
+      {
+        question: "Flegmatik temperamenti qaysı?",
+        answer: "kuchli turaqlı, kem háreket"
+      },
+      {
+        question: "Melanxolik temperamenti qaysı?",
+        answer: "kuchsiz, hálsiz, bosań "
+      },
+      {
+        question: "Temperament haqqındaǵı tálimdiń tiykarlawshileri qaysı ilimpazlar?",
+        answer: "Gippokrat "
+      },
+      {
+        question: "Ań dep nege aytıladı?",
+        answer: "Ań adamǵa berilgen tásirinlerdiń til, sóz járdeminde mánisli fikirlarni ańlatatuǵın obrazlar túrindegi miyada suwretleniwi bolıp, ol psixik eń joqarı adamǵa tán forması esaplanadı"
+      },
+      {
+        question: "Kósem, uqıp qanday uqıplıyatlar?",
+        answer: "Insannıń ayriqsha qábiletleri"
+      },
+      {
+        question: "Rawajlanıw dárejesine kóre qábiletler … ga bólinedi",
+        answer: "Iqtidor, Kósem, Uqıp "
+      },
+      {
+        question: "Pedogokika qanday pánler menen baylanıslı?",
+        answer: "Filasofiya, psixologiya, sotsiologiya, kibernetika"
+      },
+      {
+        question: "Oqıtıw processinde oqıtıwshınıń iskerligi qanday?",
+        answer: "Sabaqtı joybarlaw, oqıw jumısların shólkemlestiriw.. ...- málim qaǵıydalar tiykarında jaratılǵan til strukturaları arqalı adamlar arasındaǵı qáliplesken baylanıs forması."
+      },
+      {
+        question: "Dóretiwshilik qábiletler rawajlanıwınıń joqarı dárejesi",
+        answer: "qobiliyatlilik"
+      },
+      {
+        question: "Mútajlikler - bul:",
+        answer: "muayyan háreketlerdiń zárúr ekenligin ańǵarıw "
+      },
+      {
+        question: "Iskerlik - bul",
+        answer: "odamga tán bolǵan, ań tárepinen basqarılatuǵın, mútajliklerdi qandırıwda júzege keletuǵın, sırtqı álem hám insandı biliw, sonıń menen birge, olardı ózgertiwge qaratılǵan aktivlik"
+      },
+      {
+        question: "Iskerliginiń tiykarǵı túrlerine kiredi",
+        answer: "mashq, oyın, háreket"
+      },
+      {
+        question: "Baylanıs funkciyaları ",
+        answer: "Sotsializatsiya, tárbiyalıq, psixologiyalıq, identifikaciya, shólkemlestirilgen"
+      },
+    ]
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.toLowerCase()
+      resultsList.innerHTML = ''
+
+      if (query.trim() === '') {
+        resultsDiv.style.display = 'none'
+        return
+      }
+
+      const filteredResults = questionsAndAnswers.filter(qa => qa.question.toLowerCase().includes(query))
+
+      if (filteredResults.length > 0) {
+        filteredResults.forEach(qa => {
+          const li = document.createElement('li')
+          li.innerHTML = `Q: ${qa.question}<br>A: ${qa.answer}`
+          resultsList.appendChild(li)
+        })
+        resultsDiv.style.display = 'block'
+      } else {
+        resultsDiv.style.display = 'none'
+      }
+    })
+
+    // clear info in input (funktion)
+    searchInput.addEventListener('blur', function () {
+      searchInput.value = '' // Fokus yo'qolsa — matnni o'chirish
+      resultsDiv.style.display = 'none'
+    });
+  </script>
+</body>
+
+</html>
